@@ -22,16 +22,12 @@ $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
 $app->get('/', function ($request, $response) {
-    return $response->write('go to the /phones or /domains');
+    return $response->write('Hello!');
 });
 
-// BEGIN (write your solution here)
-$app->get('/phones', function ($request, $response) use ($phones) {
-    return $response->write(json_encode($phones));
+$app->get('/courses/{id}', function ($request, $response, array $args) {
+    $id = $args['id'];
+    return $response->write("Course id: {$id}");
 });
-$app->get('/domains', function ($request, $response) use ($domains) {
-    return $response->write(json_encode($domains));
-});
-// END
 
 $app->run();
