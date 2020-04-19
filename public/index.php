@@ -5,29 +5,26 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
 
-$faker = \Faker\Factory::create();
-$faker->seed(1234);
-
-$domains = [];
-for ($i = 0; $i < 10; $i++) {
-    $domains[] = $faker->domainName;
-}
-
-$phones = [];
-for ($i = 0; $i < 10; $i++) {
-    $phones[] = $faker->phoneNumber;
-}
+$companies = App\Generator::generate(100);
 
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
-$app->get('/', function ($request, $response) {
-    return $response->write('Hello!');
+$app->get('/', function ($request, $response, $args) {
+    return $response->write('open something like (you can change id): /companies/5');
 });
 
-$app->get('/courses/{id}', function ($request, $response, array $args) {
+// BEGIN (write your solution here)
+$app->get('/companies/{id}', function ($request, $response, array $args) use ($companies) {
     $id = $args['id'];
-    return $response->write("Course id: {$id}");
+    $company = collect($companies)->firstWhere('id', $id);
+
+    if (!$company) {
+        return $response->withStatus(404)
+            ->write('Page not found');
+    }
+    return $response->write(json_encode($company));
 });
 
 $app->run();
+// END
