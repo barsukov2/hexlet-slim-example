@@ -26,6 +26,12 @@ $app->get('/', function ($request, $response) {
 
 // BEGIN (write your solution here)
 $app->get('/users', function ($request, $response) use ($users) {
+    $search = $request->getQueryParam('search');
+    if ($search) {
+        $users = collect($users)->filter(function ($user) use ($search) {
+            return strpos($user['firstName'], $search) !== false;
+        })->toArray();
+    }
     $params = [
         'users' => $users
     ];
