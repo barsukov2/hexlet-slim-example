@@ -4,27 +4,42 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
+use DI\Container;
 
-$companies = App\Generator::generate(100);
+// Список пользователей
+// Каждый пользователь – ассоциативный массив
+// следующей структуры: id, firstName, lastName, email
+$users = App\Generator::generate(100);
 
+$container = new Container();
+$container->set('renderer', function () {
+    return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
+});
+
+AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
-$app->get('/', function ($request, $response, $args) {
-    return $response->write('open something like (you can change id): /companies/5');
+$app->get('/', function ($request, $response) {
+    return $this->get('renderer')->render($response, 'index.phtml');
 });
 
 // BEGIN (write your solution here)
-$app->get('/companies/{id}', function ($request, $response, array $args) use ($companies) {
-    $id = $args['id'];
-    $company = collect($companies)->firstWhere('id', $id);
-
-    if (!$company) {
-        return $response->withStatus(404)
-            ->write('Page not found');
-    }
-    return $response->write(json_encode($company));
+$app->get('/users', function ($request, $response) use ($users) {
+    $params = [
+        'users' => $users
+    ];
+    return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 });
 
-$app->run();
+$app->get('/users/{id}', function ($request, $response, $args) use ($users) {
+    $userId = $args['id'];
+    $user = collect($users)->firstWhere('id', $userId);
+    $params = [
+        'user' => $user
+    ];
+    return $this->get('renderer')->render($response, 'users/show.phtml', $params);
+});
 // END
+
+$app->run();

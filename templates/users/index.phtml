@@ -1,0 +1,18 @@
+<!-- BEGIN -->
+<table>
+    <tr>
+        <th>id</th>
+        <th>firstName</a></th>
+    </tr>
+    <?php foreach ($users as $user) : ?>
+        <tr>
+            <td>
+                <?= $user['id'] ?>
+            </td>
+            <td>
+                <a href="/users/<?= $user['id'] ?>"><?= $user['firstName'] ?></a>
+            </td>
+        </tr>
+    <?php endforeach ?>
+</table>
+<!-- END -->
